@@ -1,0 +1,50 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum Category {
+  ENTERTAINMENT
+  UTILITIES
+  WORK
+  FITNESS
+  OTHER
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  currency      String         @default("EUR")
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Subscription {
+  id           String       @id @default(uuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  amount       Decimal      @db.Decimal(10, 2)
+  billingCycle BillingCycle @default(MONTHLY)
+  category     Category     @default(OTHER)
+  renewalDate  DateTime     @db.Date
+  reminderDays Int          @default(3)
+  cancelUrl    String?
+  notes        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([renewalDate])
+}
