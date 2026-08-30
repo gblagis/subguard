@@ -24,6 +24,7 @@ model User {
   id            String         @id @default(uuid())
   email         String         @unique
   password      String
+  name          String?
   currency      String         @default("EUR")
   subscriptions Subscription[]
   createdAt     DateTime       @default(now())
